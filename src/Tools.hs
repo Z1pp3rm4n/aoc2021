@@ -4,6 +4,8 @@ import Text.Megaparsec (Parsec, parse, errorBundlePretty)
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void (Void)
 import Data.List (group, sort)
+import Data.Char (digitToInt)
+import Text.Megaparsec.Char (digitChar)
 
 getInput :: String -> IO String
 getInput fname = readFile ("input/" ++ fname)
@@ -23,6 +25,9 @@ myParse p s = case parse p "" s of
   Right a -> a
 
 type Parser = Parsec Void String
+
+digit :: Parser Int
+digit = digitToInt <$> digitChar
 
 integer :: Parser Int
 integer = L.decimal
@@ -48,3 +53,7 @@ instance Ord Point where
   compare (Point x1 y1) (Point x2 y2) =
     if (y1 == y2) then compare x1 x2
     else compare y1 y2
+
+(!!!) :: [[a]] -> (Int,Int) -> a
+mx !!! (x,y) = (mx !! y) !! x
+
