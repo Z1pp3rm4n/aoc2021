@@ -6,6 +6,7 @@ import Data.Void (Void)
 import Data.List (group, sort)
 import Data.Char (digitToInt)
 import Text.Megaparsec.Char (digitChar)
+import Control.Arrow ((&&&))
 
 getInput :: String -> IO String
 getInput fname = readFile ("input/" ++ fname)
@@ -37,21 +38,24 @@ double = L.float
 
 -----------
 
+counts :: Ord a => [a] -> [(a,Int)]
+counts = map (head &&& length) . group . sort
+
 repeatElems :: Ord a => [a] -> [a]
 repeatElems = map head . filter ((>1) . length) . group .sort
 
 countElem :: Eq a => a -> [a] -> Int
-countElem x = length . filter (== x) 
+countElem x = length . filter (== x)
 
 fpow :: Int -> (a -> a) -> a -> a
 fpow n f x = iterate f x !! n
 
-data Point = Point Int Int deriving (Eq, Show)
+data Point = Point {x :: Int, y :: Int} deriving (Eq, Show)
 data Line = Line Point Point deriving (Eq, Show)
 
 instance Ord Point where
   compare (Point x1 y1) (Point x2 y2) =
-    if (y1 == y2) then compare x1 x2
+    if y1 == y2 then compare x1 x2
     else compare y1 y2
 
 (!!!) :: [[a]] -> (Int,Int) -> a
