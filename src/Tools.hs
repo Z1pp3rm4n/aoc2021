@@ -7,6 +7,9 @@ import Data.List (group, sort)
 import Data.Char (digitToInt)
 import Text.Megaparsec.Char (digitChar)
 import Control.Arrow ((&&&))
+import qualified Data.Map.Internal as Map
+import Data.Map.Internal (Map)
+import Data.Foldable (foldl')
 
 getInput :: String -> IO String
 getInput fname = readFile ("input/" ++ fname)
@@ -36,6 +39,7 @@ integer = L.decimal
 double :: Parser Double
 double = L.float
 
+
 -----------
 
 counts :: Ord a => [a] -> [(a,Int)]
@@ -50,7 +54,7 @@ countElem x = length . filter (== x)
 fpow :: Int -> (a -> a) -> a -> a
 fpow n f x = iterate f x !! n
 
-data Point = Point {x :: Int, y :: Int} deriving (Eq, Show)
+data Point = Point {getX :: Int, getY :: Int} deriving (Eq, Show)
 data Line = Line Point Point deriving (Eq, Show)
 
 instance Ord Point where
@@ -58,6 +62,14 @@ instance Ord Point where
     if y1 == y2 then compare x1 x2
     else compare y1 y2
 
+
 (!!!) :: [[a]] -> (Int,Int) -> a
 mx !!! (x,y) = (mx !! y) !! x
 
+to2DMap :: [[a]] -> Map Point a
+to2DMap arr2 = mx
+  where
+    mx = foldl' (\map p@(Point x y) -> Map.insert p (arr2 !!! (x,y)) map) mempty points
+    width = length (head arr2)
+    height = length arr2
+    points = [Point x y | x <- [0..width-1], y <- [0..height-1]]

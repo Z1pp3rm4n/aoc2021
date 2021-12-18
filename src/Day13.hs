@@ -27,8 +27,8 @@ prettyPrint paper = putStrLn $ concatMap showLine [0..yMax]
   where
     showLine yLine = [showPoint (Point x_ yLine) | x_ <- [0 .. xMax]] ++ "\n"
     showPoint = \p -> if p `elem` paper then '#' else '.'
-    xMax = findMax (Set.map x paper)
-    yMax = findMax (Set.map y paper)
+    xMax = findMax (Set.map getX paper)
+    yMax = findMax (Set.map getY paper)
 
 
 foldPaper :: Paper -> Fold -> Paper
