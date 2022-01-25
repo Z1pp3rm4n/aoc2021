@@ -8,8 +8,11 @@ import Data.Char (digitToInt)
 import Text.Megaparsec.Char (digitChar)
 import Control.Arrow ((&&&))
 import qualified Data.Map.Internal as Map
+import qualified Data.Set as Set
 import Data.Map.Internal (Map)
 import Data.Foldable (foldl')
+import Data.Map.Internal ((!))
+import Data.Set (Set)
 
 getInput :: String -> IO String
 getInput fname = readFile ("input/" ++ fname)
@@ -62,14 +65,28 @@ instance Ord Point where
     if y1 == y2 then compare x1 x2
     else compare y1 y2
 
-
 (!!!) :: [[a]] -> (Int,Int) -> a
 mx !!! (x,y) = (mx !! y) !! x
 
 to2DMap :: [[a]] -> Map Point a
-to2DMap arr2 = mx
+to2DMap arr2 = Map.fromList pointsToElem
   where
-    mx = foldl' (\map p@(Point x y) -> Map.insert p (arr2 !!! (x,y)) map) mempty points
+    pointsToElem = map (\p@(Point x y) -> (p,arr2 !!! (x,y))) points
     width = length (head arr2)
     height = length arr2
     points = [Point x y | x <- [0..width-1], y <- [0..height-1]]
+
+print2DMap :: Map Point Char -> IO ()
+print2DMap pMap = putStrLn string
+  where
+    string = unlines (map showLine [yMin..yMax])
+    showLine y = map (\x -> pMap ! Point x y) [xMin..xMax]
+    points = Map.keysSet pMap
+    ((xMin,xMax),(yMin,yMax)) = getRange2D points
+    
+getRange2D :: Set Point -> ((Int,Int),(Int,Int))
+getRange2D points = ((xMin,xMax),(yMin,yMax))
+  where 
+    (xMin,xMax) = minAndMax (Set.map getX points)
+    (yMin,yMax) = minAndMax (Set.map getY points)
+    minAndMax = Set.findMin &&& Set.findMax
