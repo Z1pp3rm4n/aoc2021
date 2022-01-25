@@ -1,5 +1,6 @@
 .stack-work/
 .idea/
+input/
 out
 *~
 *.lock
